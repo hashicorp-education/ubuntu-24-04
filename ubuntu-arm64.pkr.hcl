@@ -11,6 +11,34 @@ packer {
   }
 }
 
+locals {
+  vm_name = "${var.os_version}-${var.arch}"
+}
+
+variable "iso_url" {
+  type = string
+}
+
+variable "iso_checksum" {
+  type = string
+}
+
+variable "os_version" {
+  type = string
+}
+
+variable "arch" {
+  type = string
+}
+
+variable "memory" {
+  type = number
+}
+
+variable "disk_size" {
+  type = number
+}
+
 source "virtualbox-iso" "ubuntu" {
   # Disable export to OVF since this capability is not supported for MacOS 
   # Silicon chips. We will manually create the OVF and VMDK files as part of
@@ -46,8 +74,8 @@ source "virtualbox-iso" "ubuntu" {
     " autoinstall ds=nocloud-net\\;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/",
     "<f10>" # Boot with the changes
   ]
-  http_directory   = "http"
-  
+  http_directory = "http"
+
   shutdown_command = "echo 'vagrant' | sudo -S shutdown -P now"
   disable_shutdown = true
 
@@ -92,9 +120,9 @@ build {
   # Add any provisioning steps here if needed
   provisioner "shell" {
     scripts = [
-      "scripts/update.sh",
-      "scripts/vagrant.sh",
-      "scripts/guest-additions.sh"
+      "scripts/arm64/update.sh",
+      "scripts/arm64/vagrant.sh",
+      "scripts/arm64/guest-additions.sh"
     ]
   }
 
@@ -122,7 +150,7 @@ build {
       # Create fresh output directory
       "echo \"OUTPUT_DIR is set to: $OUTPUT_DIR\"",
       "mkdir -p \"$OUTPUT_DIR\"",
-      
+
       # Stop VM so we can interact with VDI
       "echo 'Ensuring VM is stopped...'",
       "VBoxManage list runningvms | grep -q \"$VM_NAME\" && VBoxManage controlvm \"$VM_NAME\" poweroff || true",
@@ -131,7 +159,7 @@ build {
       # Convert VDI to VMDK
       "echo 'Converting VDI to VMDK...'",
       "VBoxManage clonemedium \"$VDI_SOURCE\" \"$OUTPUT_DIR/$VM_NAME-disk001.vmdk\" --format VMDK --variant StreamOptimized",
-      
+
       # Verify VMDK creation
       "if [ ! -f \"$OUTPUT_DIR/$VM_NAME-disk001.vmdk\" ]; then echo 'Error: VMDK file was not created!' && exit 1; fi",
 
@@ -163,16 +191,16 @@ build {
   }
 
   # Upload to HCP Vagrant Registry
-  post-processors {
-    post-processor "artifice" {
-      files = ["./output-vagrant/${local.vm_name}.box"]
-    }
-    post-processor "vagrant-registry" {
-      client_id     = var.hcp_client_id
-      client_secret = var.hcp_client_secret
-      box_tag      = "im2nguyen/ubuntu-24-04"
-      version      = "0.1.0"
-      architecture = var.arch
-    }
-  }
+  # post-processors {
+  #   post-processor "artifice" {
+  #     files = ["./output-vagrant/${local.vm_name}.box"]
+  #   }
+  #   post-processor "vagrant-registry" {
+  #     client_id     = var.hcp_client_id
+  #     client_secret = var.hcp_client_secret
+  #     box_tag      = "im2nguyen/ubuntu-24-04"
+  #     version      = "0.1.0"
+  #     architecture = var.arch
+  #   }
+  # }
 }

@@ -1,19 +1,29 @@
 ## Ubuntu 24.04
 
 This repository contains the Packer files to build Ubuntu 24.04 Vagrant boxes
-for ARM64.
+for ARM64 and AMD64.
 
 To build the Vagrantboxes, enter the following commands:
 
 ```
-packer init .
-packer build .
+packer init ubuntu-arm64.pkr.hcl
+packer build -var-file="arm64.pkrvars.hcl" ubuntu-arm64.pkr.hcl
+packer build -var-file="amd64.pkrvars.hcl" ubuntu-amd64.pkr.hcl
+```
+
+With debugging:
+
+```
+PACKER_LOG=debug PACKER_LOG_PATH=ubuntu.log packer build -var-file="arm64.pkrvars.hcl" ubuntu-arm64.pkr.hcl
+PACKER_LOG=debug PACKER_LOG_PATH=ubuntu.log packer build -var-file="amd64.pkrvars.hcl" ubuntu-amd64.pkr.hcl
 ```
 
 Packer will spin up the Ubuntu image and configure it for Vagrant. It will 
-generate the files in `output-vagrant`. This Packer configuration currently uses
-a workaround for building the Vagrantbox since you cannot export VMs to OVF files
-in VirtualBox MacOS with Silicion (ARM64).
+generate the files in `output-vagrant`. 
+
+For ARM64, this Packer configuration currently uses a workaround for building 
+the Vagrantbox since you cannot export VMs to OVF files in VirtualBox MacOS 
+with Silicion (ARM64).
 
 To manually build the Vagrantbox:
 
