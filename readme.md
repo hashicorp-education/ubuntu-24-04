@@ -1,7 +1,7 @@
 ## Ubuntu 24.04
 
 This repository contains the Packer files to build Ubuntu 24.04 Vagrant boxes
-for both ARM64 and AMD64.
+for ARM64.
 
 To build the Vagrantboxes, enter the following commands:
 
