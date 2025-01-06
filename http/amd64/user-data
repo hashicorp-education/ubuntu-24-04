@@ -1,0 +1,48 @@
+#cloud-config
+autoinstall:
+  version: 1
+  locale: en_US.UTF-8
+  refresh-installer:
+    update: no
+  keyboard:
+    layout: us
+  identity:
+    hostname: vagrant-ubuntu
+    username: vagrant
+    password: '$6$rounds=4096$5CU3LEj/MQvbkfPb$LmKEF9pCfU8R.dA.GemgE/8GT6r9blge3grJvdsVTMFKyLEQwzEF3SGWqAzjawY/XHRpWj4fOiLBrRyxJhIRJ1'
+  
+  storage:
+    layout:
+      name: lvm
+  
+  network:
+    network:
+      version: 2
+      ethernets:
+        enp0s3:
+          dhcp4: true
+
+  ssh:
+    install-server: true
+    allow-pw: true
+
+  packages:
+    - grub-efi-amd64
+    - efibootmgr
+    - openssh-server
+
+  user-data:
+    disable_root: false
+    timezone: UTC
+
+  late-commands:
+    - sed -i 's/#LogLevel INFO/LogLevel DEBUG/' /target/etc/ssh/sshd_config
+    - systemctl stop ssh.service
+    - systemctl enable ssh.service
+    - systemctl start ssh.service
+    - curtin in-target -- update-grub
+    - curtin in-target -- grub-install --target=x86_64-efi --efi-directory=/boot/efi --removable
+    - echo 'vagrant ALL=(ALL) NOPASSWD:ALL' > /target/etc/sudoers.d/vagrant
+    - chmod 440 /target/etc/sudoers.d/vagrant
+
+  interactive-sections: []

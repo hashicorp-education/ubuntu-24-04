@@ -47,11 +47,11 @@ source "virtualbox-iso" "ubuntu" {
 
   # VM settings
   vm_name              = local.vm_name
-  guest_os_type        = "Ubuntu64"
+  guest_os_type        = "Ubuntu_64"
   disk_size            = var.disk_size
   memory               = var.memory
   hard_drive_interface = "sata"
-  headless             = true
+  # headless             = true
 
   # SSH settings
   ssh_username = "vagrant"
@@ -61,12 +61,10 @@ source "virtualbox-iso" "ubuntu" {
   # Boot settings
   boot_wait = "5s"
   boot_command = [
-    "<enter>",            # Select "Try or Install Ubuntu Server"
-    "<wait5>",            # Wait for GRUB menu to load
-    "e",                  # Edit mode
-    "<down><down><down>", # Navigate to the kernel command line
-    "<end>",              # Go to end of line
-    " autoinstall ds=nocloud-net\\;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/",
+    "e<wait2>",                   # Enter edit mode
+    "<down><down><down><wait2>",  # Navigate to the kernel command line
+    "<end><wait>",                # Go to the end of the kernel line
+    " autoinstall ds=nocloud-net\\;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/amd64/<wait>",
     "<f10>" # Boot with the changes
   ]
   http_directory = "http"
@@ -79,7 +77,7 @@ source "virtualbox-iso" "ubuntu" {
     ["modifyvm", "{{.Name}}", "--graphicscontroller", "vmsvga"],
 
     # Firmware and CPU
-    ["modifyvm", "{{.Name}}", "--firmware", "bios"],
+    ["modifyvm", "{{.Name}}", "--firmware", "efi"],
     ["modifyvm", "{{.Name}}", "--cpu-profile", "host"],
     ["modifyvm", "{{.Name}}", "--pae", "on"],
     ["modifyvm", "{{.Name}}", "--hwvirtex", "on"],
@@ -87,8 +85,8 @@ source "virtualbox-iso" "ubuntu" {
     ["modifyvm", "{{.Name}}", "--vtxux", "on"],
 
     # Input devices
-    ["modifyvm", "{{.Name}}", "--mouse", "usbtablet"],
-    ["modifyvm", "{{.Name}}", "--keyboard", "usb"],
+    ["modifyvm", "{{.Name}}", "--mouse", "ps2"],
+    ["modifyvm", "{{.Name}}", "--keyboard", "ps2"],
 
     # Boot order
     ["modifyvm", "{{.Name}}", "--boot1", "disk"],
@@ -116,9 +114,9 @@ build {
 
   provisioner "shell" {
     scripts = [
-      "scripts/update.sh",
-      "scripts/vagrant.sh",
-      "scripts/guest-additions.sh"
+      "scripts/amd64/update.sh",
+      "scripts/amd64/vagrant.sh",
+      "scripts/amd64/guest-additions.sh"
     ]
   }
 
@@ -132,7 +130,7 @@ build {
     #   client_secret = var.hcp_client_secret
     #   box_tag       = "im2nguyen/ubuntu-24-04"
     #   version       = "0.1.0"
-    #   architecture  = local.arch
+    #   architecture  = var.arch
     # }
   }
 }

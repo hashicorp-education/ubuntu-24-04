@@ -71,7 +71,7 @@ source "virtualbox-iso" "ubuntu" {
     "e",                  # Edit mode
     "<down><down><down>", # Navigate to the kernel command line
     "<end>",              # Go to end of line
-    " autoinstall ds=nocloud-net\\;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/",
+    " autoinstall ds=nocloud-net\\;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/arm64/",
     "<f10>" # Boot with the changes
   ]
   http_directory = "http"

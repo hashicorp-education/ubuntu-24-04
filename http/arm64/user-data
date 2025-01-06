@@ -21,10 +21,6 @@ autoinstall:
       ethernets:
         enp0s3:
           dhcp4: true
-  
-  # early-commands:
-  #   - systemctl stop ssh.service
-  #   - systemctl stop ssh.socket
 
   ssh:
     install-server: true
@@ -49,4 +45,4 @@ autoinstall:
     - echo 'vagrant ALL=(ALL) NOPASSWD:ALL' > /target/etc/sudoers.d/vagrant
     - chmod 440 /target/etc/sudoers.d/vagrant
 
-  interactive-sections: []    # This tells the installer to not prompt for any input
+  interactive-sections: []
